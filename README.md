@@ -1,5 +1,5 @@
 # Danube Fanfare Player
-This repository contains code for a sound playback module to replace a very popular MP3 player which is used in many robotics projects, but comes with a lot of problems that we will hopefully fix. And we will add a lot of features.
+This repository contains code for a sound playback module to replace a very popular MP3 player which is used in many robotics projects, but comes with a lot of problems that we will hopefully fix. And we will add a lot of features. Please peruse [the Wiki](https://github.com/bjoerngiesler/DanubeFanfare/wiki) for documentation.
 
 The sound module is based on ESP32S3 hardware ([Xiao ESP32S3](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/)) or [Adafruit Qt PY ESP](https://www.adafruit.com/product/5426)) and Adafruit's [Audio BFF](https://www.adafruit.com/product/5769) combination SD card and D/A converter bundle. The software is based on Paul Schatzmann's [Arduino Audio Tools](https://github.com/pschatzmann/arduino-audio-tools) library.
 
@@ -11,6 +11,9 @@ An adapter board that will allow plugging the ESP32/BFF bundle directly into a s
 * WAV playback
 * MP3 playback
 * MP3-based internet stream playback
+* Effects (currently only delay, more soon) on the file player path
+* Signal generator (sine/square/saw) to debug your audio path
+* Volume meter on ESP32's onboard LED
 * WiFi connection
 
 **Planned Features:**
