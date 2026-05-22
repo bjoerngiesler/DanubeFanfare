@@ -9,7 +9,7 @@
 enum DFPCmdCode {
     CMD_NEXT             = 0x01, // done, untested
     CMD_PREV             = 0x02, // done, untested
-    CMD_PLAY             = 0x03, // ?? This is called "Specify tracking (NUM)" in the original manual
+    CMD_PLAY             = 0x03, // Play given track
     CMD_INC_VOL          = 0x04, // done, untested
     CMD_DEC_VOL          = 0x05, // done, untested
     CMD_VOLUME           = 0x06, // done
@@ -100,6 +100,8 @@ public:
     Result step();
     Result stop(ConsoleStream *stream = nullptr);
 
+    void handle(Stream* stream);
+
     Result setBps(unsigned int bps);
 
     void cmdReset(const DFPCmd& cmd);
@@ -108,15 +110,17 @@ public:
     void cmdPlayFolder(const DFPCmd& cmd);
     void cmdGetUFiles(const DFPCmd& cmd);
     void cmdGetFolderFiles(const DFPCmd& cmd);
+    void cmdPlay(const DFPCmd& cmd);
 
     bool sendCommand(const DFPCmd& cmd);
 protected:
     static std::map<DFPCmdCode, std::function<void(const DFPCmd& cmd)>> callbackMap_;
-    bool waitAvailable(unsigned int timeout, uint8_t& byte);
-    bool readDFPCmd(DFPCmd& DFPCmd, unsigned int timeout);
+    bool waitAvailable(uint8_t& byte);
+    bool readDFPCmd(DFPCmd& DFPCmd);
 
     unsigned int bps_ = 9600;
     HardwareSerial& ser_ = Serial1;
+    unsigned long timeoutUS_ = 2*(1000000 / (bps_/10));
 };
 
 #endif // DFPHANDLER_H

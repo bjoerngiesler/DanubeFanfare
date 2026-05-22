@@ -18,23 +18,23 @@ bool initial = true;
 static const char *SEC_GLOBAL = "global";
 static const char *SEC_SIGGEN = "signal_generator";
 static const char *SEC_FILEPL = "file_player";
+static const char *SEC_WIFI = "wifi";
+static const char *SEC_MONACO = "monaco";
 
-static const char *KEY_VOLUME = "volume";
-static const char *KEY_SIGGEN = "signal_generator";
-static const char *KEY_FILEPL = "file_player";
+// Global config keys
 static const char *KEY_IGNORE_DOTFILES = "ignore_dotfiles";
 static const char *KEY_IGNORE_NONNUMERIC = "ignore_non_numeric";
 static const char *KEY_FILE_INDEXING_MODE = "file_indexing_mode";
 static const char *VAL_NUMAL = "numal";
 static const char *VAL_ALNUM = "alnum";
 static const char *VAL_ORIG = "orig";
+static const char *KEY_VOLUME = "volume";
 
-static const char *KEY_FREQUENCY = "frequency";
-static const char *KEY_WAVEFORM = "waveform";
-static const char *VAL_SINE = "sine";
-static const char *VAL_SQUARE = "square";
-static const char *VAL_SAWTOOTH = "sawtooth";
+static const char *KEY_SSID = "ssid";
+static const char *KEY_PASSWORD = "password";
 
+// File Player config keys
+static const char *KEY_BPS = "bps";
 static const char *KEY_PLAY_ON_STARTUP = "play_on_startup";
 static const char *KEY_PLAY_ON_REMOVE = "play_on_remove";
 static const char *KEY_PLAY_ON_INSERT = "play_on_insert";
@@ -44,21 +44,17 @@ static const char *KEY_DELAY_DEPTH = "delay_depth";
 static const char *KEY_DELAY_FEEDBACK = "delay_feedback";
 static const char *KEY_DELAY_TIME = "delay_time";
 
+// Signal generator config keys
+static const char *KEY_FREQUENCY = "frequency";
+static const char *KEY_WAVEFORM = "waveform";
+static const char *VAL_SINE = "sine";
+static const char *VAL_SQUARE = "square";
+static const char *VAL_SAWTOOTH = "sawtooth";
 
 MemFile removedMemFile;
 
 void startup() {
     Configuration config("/config.ini");
-
-    // FIXME Read and store file for "play_on_remove"
-
-    if(config.valueForKey("global", "wifi", "off") == "on") {
-        String ssid = config.valueForKey("wifi", "ssid");
-        String password = config.valueForKey("wifi", "password");
-        Serial.printf("Connecting to WiFi network '%s' with password '%s'\n", ssid.c_str(), password.c_str());
-        wifiMulti.addAP(ssid.c_str(), password.c_str());
-        wifiMulti.run();
-    }
 
     FileManager::inst.setIgnoreDotfiles(config.valueForKey(SEC_GLOBAL, KEY_IGNORE_DOTFILES, true));
     FileManager::inst.setIgnoreNonNumeric(config.valueForKey(SEC_GLOBAL, KEY_IGNORE_NONNUMERIC, false));
@@ -73,8 +69,18 @@ void startup() {
 
     FileManager::inst.buildFileMap();
 
+    if(config.valueForKey(SEC_GLOBAL, SEC_WIFI, false)) {
+        String ssid = config.valueForKey(SEC_WIFI, KEY_SSID);
+        String password = config.valueForKey(SEC_WIFI, KEY_PASSWORD);
+        Serial.printf("Connecting to WiFi network '%s' with password '%s'\n", ssid.c_str(), password.c_str());
+        wifiMulti.addAP(ssid.c_str(), password.c_str());
+        wifiMulti.run();
+    }
+
+    DFPHandler::inst.setBps(config.valueForKey(SEC_GLOBAL, KEY_BPS, 9600));
+
     // Configure signal generator
-    Player::inst.setSignalGeneratorEnabled(config.valueForKey(SEC_GLOBAL, KEY_SIGGEN, false));
+    Player::inst.setSignalGeneratorEnabled(config.valueForKey(SEC_GLOBAL, SEC_SIGGEN, false));
     Player::inst.setSignalGeneratorFrequency(config.valueForKey(SEC_SIGGEN, KEY_FREQUENCY, 440.0f));
     Player::inst.setSignalGeneratorVolume(config.valueForKey(SEC_SIGGEN, KEY_VOLUME, 1.0f));
     String waveform = config.valueForKey(SEC_SIGGEN, KEY_WAVEFORM, VAL_SINE);
